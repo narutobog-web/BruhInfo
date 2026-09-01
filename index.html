@@ -12,7 +12,7 @@
         header { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 100; pointer-events: none; text-shadow: 0 0 15px #ff5e00, 0 0 30px #9d4edd; }
         header p { color: #a0a5b5; font-size: 1.1rem; margin-top: 4px; text-shadow: none; }
         
-        /* ИЗМЕНЕНО: Теперь это жесткий холст 1920x1080, который сжимается скриптом */
+        /* Холст 1920x1080, который сжимается скриптом */
         .room-viewport { position: absolute; top: 50%; left: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%) scale(1); transform-origin: center; background: url('bg.png') center/cover no-repeat; overflow: hidden; }
         
         /* Персонажи и ховер-эффект */
@@ -39,7 +39,7 @@
         .sign-roulette { left: 85%; top: 20%; height: 28vh; }
         .sign-microphone { left: 90%; top: 45%; height: 30vh; }
 
-        /* Мобильная версия */
+        /* Мобильная версия - включается ТОЛЬКО если есть сенсорный экран (палец) */
         .mobile-container { display: none; }
 
         /* Модальные окна */
@@ -98,7 +98,8 @@
         .tier-e { border-left: 4px solid #c084fc; }
         .tier-l { border-left: 4px solid #fbbf24; }
 
-        @media (max-width: 768px) {
+        /* ИЗМЕНЕНО: Добавлено and (pointer: coarse) */
+        @media (max-width: 768px) and (pointer: coarse) {
             body { height: auto; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
             header { position: static; transform: none; width: 100%; padding: 15px 10px 0; }
             header h1 { font-size: 1.6rem; }
@@ -413,7 +414,7 @@
         }
     }
 
-    // ===== НОВЫЙ КОД: Масштабирование комнаты под размер окна =====
+    // Масштабирование комнаты под размер окна
     function scaleRoom() {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
