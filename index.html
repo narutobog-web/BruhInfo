@@ -7,18 +7,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: #07070b; color: #fff; height: 100vh; width: 100vw; overflow: hidden; position: relative; font-family: 'Montserrat', sans-serif; }
         
-        header { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 100; pointer-events: none; text-shadow: 0 0 15px #ff5e00, 0 0 30px #9d4edd; }
-        header p { color: #a0a5b5; font-size: 1.1rem; margin-top: 4px; text-shadow: none; }
+        /* Убираем любые скроллы и лишние отступы, фон на весь экран */
+        body { 
+            background: #07070b; 
+            color: #fff; 
+            height: 100vh; 
+            width: 100vw; 
+            overflow: hidden; 
+            position: relative; 
+            font-family: 'Montserrat', sans-serif; 
+        }
         
-        .room-viewport { position: absolute; inset: 0; width: 100%; height: 100%; background: url('bg.png') center/cover no-repeat; overflow: hidden; }
+        header { 
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center; 
+            z-index: 100; 
+            pointer-events: none;
+            text-shadow: 0 0 15px #ff5e00, 0 0 30px #9d4edd; 
+        }
+        header h1 { font-size: 1.8rem; }
+        header p { color: #a0a5b5; font-size: 0.95rem; margin-top: 2px; text-shadow: none; }
+
+        /* Комната на 100% ширины и высоты экрана без полос */
+        .room-viewport { 
+            position: absolute; 
+            inset: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: url('bg.png') center/cover no-repeat; 
+            overflow: hidden; 
+        }
         
-        /* Персонажи и ховер-эффект */
+        /* Персонажи и плашки через пропорциональные проценты */
         .room-npc { position: absolute; cursor: pointer; z-index: 10; bottom: 5%; transform: translateX(-50%); filter: drop-shadow(0 0 8px rgba(0,0,0,0.9)); transition: transform 0.2s, filter 0.2s; }
-        .npc-commands { left: 15%; bottom: 0%; height: 65vh; }
-        .npc-price { left: 50%; bottom: 10%; height: 30vh; }
-        .npc-pc { left: 90%; height: 55vh; }
+        .npc-commands { left: 15%; bottom: 0%; height: 62vh; transform: translateX(-50%); }
+        .npc-price { left: 50%; bottom: 8%; height: 32vh; transform: translateX(-50%); }
+        .npc-pc { left: 90%; bottom: 5%; height: 52vh; transform: translateX(-50%); }
 
         .room-npc:hover {
             transform: translateX(-50%) scale(1.05);
@@ -28,15 +56,15 @@
         .sign { position: absolute; cursor: pointer; z-index: 6; transform: translate(-50%, -50%); filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); transition: transform 0.2s; }
         .sign:hover { transform: translate(-50%, -50%) scale(1.08); filter: drop-shadow(0 0 15px #00e5ff); }
         
-        .sign-telegram { left: 29%; top: 20%; height: 20vh; }
-        .sign-meme { left: 40%; top: 22%; height: 25vh; }
-        .sign-donationalerts { left: 60%; top: 22%; height: 25vh; }
-        .sign-donatex { left: 73%; top: 40%; height: 26vh; }
-        .sign-steam { left: 35%; top: 59%; height: 20vh; }
-        .sign-rules { left: 48%; top: 42%; height: 14vh; }
-        .sign-youtube { left: 55%; top: 55%; height: 14vh; }
-        .sign-roulette { left: 85%; top: 20%; height: 28vh; }
-        .sign-microphone { left: 90%; top: 45%; height: 30vh; }
+        .sign-telegram { left: 29%; top: 20%; height: 18vh; }
+        .sign-meme { left: 40%; top: 22%; height: 22vh; }
+        .sign-donationalerts { left: 60%; top: 22%; height: 22vh; }
+        .sign-donatex { left: 73%; top: 40%; height: 24vh; }
+        .sign-steam { left: 35%; top: 59%; height: 18vh; }
+        .sign-rules { left: 48%; top: 42%; height: 12vh; }
+        .sign-youtube { left: 55%; top: 55%; height: 12vh; }
+        .sign-roulette { left: 85%; top: 20%; height: 25vh; }
+        .sign-microphone { left: 90%; top: 45%; height: 28vh; }
 
         /* Мобильная версия */
         .mobile-container { display: none; }
@@ -52,7 +80,7 @@
         .modal-close:hover { color: #fff; }
         
         /* Кнопка плеера */
-        .track-item { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .track-item { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; }
         .play-btn {
             background: #9d4edd;
             color: white;
@@ -66,6 +94,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            white-space: nowrap;
         }
         .play-btn:hover { background: #b065ff; transform: scale(1.05); }
         .play-btn.playing { background: #ff5e00; }
@@ -98,22 +127,13 @@
         .tier-l { border-left: 4px solid #fbbf24; }
 
         @media (max-width: 768px) {
-            body { height: auto; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
-            header { position: static; transform: none; width: 100%; padding: 15px 10px 0; }
-            header h1 { font-size: 1.6rem; }
-            header p { font-size: 0.7rem; }
+            body { height: auto; min-height: 100vh; overflow-y: auto; padding: 10px; }
+            header { position: static; transform: none; width: 100%; margin-bottom: 15px; }
             .room-viewport { display: none; }
             
-            .mobile-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 20px; gap: 15px; background: radial-gradient(circle at top, #2a0b3d, #07070b); }
-            
-            .mobile-npc { width: 280px; max-width: 90%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); transition: transform 0.2s; }
-            .mobile-logo { width: 220px; max-width: 85%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); transition: transform 0.2s; }
-            .mobile-logo:active, .mobile-npc:active { transform: scale(0.95); }
-
-            .modal-box { width: 95%; padding: 20px; max-height: 90dvh; font-size: 0.95rem; }
-            .modal-box h2 { font-size: 1.4rem; }
-            .track-item { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .play-btn { width: 100%; justify-content: center; }
+            .mobile-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 15px; gap: 15px; background: radial-gradient(circle at top, #2a0b3d, #07070b); border-radius: 12px; }
+            .mobile-npc { width: 260px; max-width: 90%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); }
+            .mobile-logo { width: 200px; max-width: 85%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); }
         }
     </style>
 </head>
@@ -349,8 +369,6 @@
         document.getElementById(id).classList.remove('active'); 
         stopAllAudio();
     }
-    
-    // ИСПРАВЛЕНИЕ ОШИБКИ: Заменили e.target.classList.add на просто наличие объекта classList
     window.onclick = e => { 
         if (e.target.classList && e.target.classList.contains('modal-overlay')) {
             e.target.classList.remove('active');
