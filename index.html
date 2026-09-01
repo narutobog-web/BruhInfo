@@ -7,40 +7,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: #07070b; color: #fff; height: 100vh; width: 100vw; overflow: hidden; position: relative; font-family: 'Montserrat', sans-serif; }
+        body { background: #07070b; color: #fff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; }
         
-        header { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 100; pointer-events: none; text-shadow: 0 0 15px #ff5e00, 0 0 30px #9d4edd; }
-        header p { color: #a0a5b5; font-size: 1.1rem; margin-top: 4px; text-shadow: none; }
-        
-        /* Комната растягивается на весь экран без черных полос */
-        .room-viewport { position: absolute; inset: 0; width: 100%; height: 100%; background: url('bg.png') center/cover no-repeat; overflow: hidden; }
-        
-        /* Персонажи и ховер-эффект */
-        .room-npc { position: absolute; cursor: pointer; z-index: 10; bottom: 5%; transform: translateX(-50%); filter: drop-shadow(0 0 8px rgba(0,0,0,0.9)); transition: transform 0.2s, filter 0.2s; }
-        
-        /* ФИКСИРОВАННЫЕ РАЗМЕРЫ (не сжимаются) */
-        .npc-commands { left: 15%; bottom: 0%; height: 600px; }
-        .npc-price { left: 50%; bottom: 10%; height: 250px; }
-        .npc-pc { left: 90%; height: 500px; }
+        header { text-align: center; margin-bottom: 10px; z-index: 100; text-shadow: 0 0 15px #ff5e00, 0 0 30px #9d4edd; flex-shrink: 0; }
+        header p { color: #a0a5b5; font-size: 1rem; margin-top: 4px; text-shadow: none; }
 
-        .room-npc:hover {
-            transform: translateX(-50%) scale(1.05);
+        /* Оболочка комнаты, которая идеально масштабируется без искажений */
+        .room-wrapper {
+            position: relative;
+            width: 100vw;
+            height: calc(100vh - 80px);
+            max-width: 1920px;
+            max-height: 1080px;
+            background: url('bg.png') center/cover no-repeat;
+            overflow: hidden;
+        }
+
+        /* Интерактивные элементы через проценты относительно идеального холста */
+        .room-npc, .sign {
+            position: absolute;
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+            transition: transform 0.2s, filter 0.2s;
+            transform: translate(-50%, -50%);
+        }
+
+        .room-npc:hover, .sign:hover {
+            transform: translate(-50%, -50%) scale(1.06);
             filter: drop-shadow(0 0 20px #00e5ff);
         }
 
-        .sign { position: absolute; cursor: pointer; z-index: 6; transform: translate(-50%, -50%); filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); transition: transform 0.2s; }
-        .sign:hover { transform: translate(-50%, -50%) scale(1.08); filter: drop-shadow(0 0 15px #00e5ff); }
-        
-        /* ФИКСИРОВАННЫЕ РАЗМЕРЫ ПЛАШЕК */
-        .sign-telegram { left: 29%; top: 20%; height: 150px; }
-        .sign-meme { left: 40%; top: 22%; height: 170px; }
-        .sign-donationalerts { left: 60%; top: 22%; height: 180px; }
-        .sign-donatex { left: 73%; top: 40%; height: 170px; }
-        .sign-steam { left: 35%; top: 59%; height: 150px; }
-        .sign-rules { left: 48%; top: 42%; height: 120px; }
-        .sign-youtube { left: 55%; top: 55%; height: 150px; }
-        .sign-roulette { left: 85%; top: 20%; height: 200px; }
-        .sign-microphone { left: 90%; top: 45%; height: 220px; }
+        .room-npc:active, .sign:active {
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+
+        /* Точные координаты и размеры всех объектов (в % от размеров комнаты) */
+        .npc-commands { left: 15%; top: 68%; height: 60%; transform: translate(-50%, -50%); }
+        .npc-price { left: 50%; top: 82%; height: 32%; transform: translate(-50%, -50%); }
+        .npc-pc { left: 90%; top: 72%; height: 50%; transform: translate(-50%, -50%); }
+
+        .sign-telegram { left: 29%; top: 20%; height: 18%; }
+        .sign-meme { left: 40%; top: 22%; height: 22%; }
+        .sign-donationalerts { left: 60%; top: 22%; height: 22%; }
+        .sign-donatex { left: 73%; top: 40%; height: 24%; }
+        .sign-steam { left: 35%; top: 59%; height: 18%; }
+        .sign-rules { left: 48%; top: 42%; height: 12%; }
+        .sign-youtube { left: 55%; top: 55%; height: 12%; }
+        .sign-roulette { left: 85%; top: 20%; height: 25%; }
+        .sign-microphone { left: 90%; top: 45%; height: 28%; }
 
         /* Модальные окна */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
@@ -53,7 +67,7 @@
         .modal-close:hover { color: #fff; }
         
         /* Кнопка плеера */
-        .track-item { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .track-item { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; }
         .play-btn {
             background: #9d4edd;
             color: white;
@@ -67,6 +81,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            white-space: nowrap;
         }
         .play-btn:hover { background: #b065ff; transform: scale(1.05); }
         .play-btn.playing { background: #ff5e00; }
@@ -97,6 +112,19 @@
         .tier-r { border-left: 4px solid #38bdf8; }
         .tier-e { border-left: 4px solid #c084fc; }
         .tier-l { border-left: 4px solid #fbbf24; }
+
+        @media (max-width: 768px) {
+            body { height: auto; min-height: 100dvh; overflow-y: auto; padding: 10px; }
+            .room-wrapper { display: none; }
+            header { margin-bottom: 15px; }
+            header h1 { font-size: 1.5rem; }
+            header p { font-size: 0.75rem; }
+            
+            .mobile-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 15px; gap: 15px; background: radial-gradient(circle at top, #2a0b3d, #07070b); border-radius: 12px; }
+            .mobile-npc { width: 260px; max-width: 90%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); }
+            .mobile-logo { width: 200px; max-width: 85%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); }
+        }
+        .mobile-container { display: none; }
     </style>
 </head>
 <body>
@@ -106,7 +134,7 @@
     <p>Нажимай на плашки, чтобы узнать информацию</p>
 </header>
 
-<div class="room-viewport">
+<div class="room-wrapper">
     <a href="https://t.me/BruhContent" target="_blank"><img src="Telegram.png" class="sign sign-telegram" onerror="this.style.display='none'"></a>
     <a href="https://memealerts.com/Mr.The.BooK" target="_blank"><img src="MemeAlerts.png" class="sign sign-meme" onerror="this.style.display='none'"></a>
     <a href="https://www.donationalerts.com/r/bruhchannel" target="_blank"><img src="Donation_Alerts.png" class="sign sign-donationalerts" onerror="this.style.display='none'"></a>
@@ -121,6 +149,15 @@
     <img src="a_character_with_commands.png" class="room-npc npc-commands" onclick="openModal('modal-commands')" onerror="this.style.display='none'">
     <img src="price_list.png" class="room-npc npc-price" onclick="openModal('modal-price')" onerror="this.style.display='none'">
     <img src="the_character_behind_the_computer.png" class="room-npc npc-pc" onclick="openModal('modal-pc')" onerror="this.style.display='none'">
+</div>
+
+<div class="mobile-container">
+    <img src="price_list.png" class="mobile-npc" onclick="openModal('modal-price')" onerror="this.style.display='none'">
+    <a href="https://www.donationalerts.com/r/bruhchannel" target="_blank"><img src="Donation_Alerts.png" class="mobile-logo" onerror="this.style.display='none'"></a>
+    <a href="https://donatex.gg/donate/bruhc" target="_blank"><img src="Donatex.png" class="mobile-logo" onerror="this.style.display='none'"></a>
+    <a href="https://memealerts.com/Mr.The.BooK" target="_blank"><img src="MemeAlerts.png" class="mobile-logo" onerror="this.style.display='none'"></a>
+    <img src="microphone.png" class="mobile-logo" onclick="openModal('modal-tracklist')" onerror="this.style.display='none'">
+    <a href="https://t.me/BruhContent" target="_blank"><img src="Telegram.png" class="mobile-logo" onerror="this.style.display='none'"></a>
 </div>
 
 <div class="modal-overlay" id="modal-rules">
@@ -322,7 +359,6 @@
         document.getElementById(id).classList.remove('active'); 
         stopAllAudio();
     }
-    
     window.onclick = e => { 
         if (e.target.classList && e.target.classList.contains('modal-overlay')) {
             e.target.classList.remove('active');
