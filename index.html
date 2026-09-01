@@ -12,14 +12,16 @@
         header { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 100; pointer-events: none; text-shadow: 0 0 15px #ff5e00, 0 0 30px #9d4edd; }
         header p { color: #a0a5b5; font-size: 1.1rem; margin-top: 4px; text-shadow: none; }
         
-        /* Холст 1920x1080, который сжимается скриптом */
-        .room-viewport { position: absolute; top: 50%; left: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%) scale(1); transform-origin: center; background: url('bg.png') center/cover no-repeat; overflow: hidden; }
+        /* Комната растягивается на весь экран без черных полос */
+        .room-viewport { position: absolute; inset: 0; width: 100%; height: 100%; background: url('bg.png') center/cover no-repeat; overflow: hidden; }
         
         /* Персонажи и ховер-эффект */
         .room-npc { position: absolute; cursor: pointer; z-index: 10; bottom: 5%; transform: translateX(-50%); filter: drop-shadow(0 0 8px rgba(0,0,0,0.9)); transition: transform 0.2s, filter 0.2s; }
-        .npc-commands { left: 15%; bottom: 0%; height: 65vh; }
-        .npc-price { left: 50%; bottom: 10%; height: 30vh; }
-        .npc-pc { left: 90%; height: 55vh; }
+        
+        /* ФИКСИРОВАННЫЕ РАЗМЕРЫ (не сжимаются) */
+        .npc-commands { left: 15%; bottom: 0%; height: 600px; }
+        .npc-price { left: 50%; bottom: 10%; height: 250px; }
+        .npc-pc { left: 90%; height: 500px; }
 
         .room-npc:hover {
             transform: translateX(-50%) scale(1.05);
@@ -29,18 +31,16 @@
         .sign { position: absolute; cursor: pointer; z-index: 6; transform: translate(-50%, -50%); filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); transition: transform 0.2s; }
         .sign:hover { transform: translate(-50%, -50%) scale(1.08); filter: drop-shadow(0 0 15px #00e5ff); }
         
-        .sign-telegram { left: 29%; top: 20%; height: 20vh; }
-        .sign-meme { left: 40%; top: 22%; height: 25vh; }
-        .sign-donationalerts { left: 60%; top: 22%; height: 25vh; }
-        .sign-donatex { left: 73%; top: 40%; height: 26vh; }
-        .sign-steam { left: 35%; top: 59%; height: 20vh; }
-        .sign-rules { left: 48%; top: 42%; height: 14vh; }
-        .sign-youtube { left: 55%; top: 55%; height: 14vh; }
-        .sign-roulette { left: 85%; top: 20%; height: 28vh; }
-        .sign-microphone { left: 90%; top: 45%; height: 30vh; }
-
-        /* Мобильная версия - включается ТОЛЬКО если есть сенсорный экран (палец) */
-        .mobile-container { display: none; }
+        /* ФИКСИРОВАННЫЕ РАЗМЕРЫ ПЛАШЕК */
+        .sign-telegram { left: 29%; top: 20%; height: 150px; }
+        .sign-meme { left: 40%; top: 22%; height: 170px; }
+        .sign-donationalerts { left: 60%; top: 22%; height: 180px; }
+        .sign-donatex { left: 73%; top: 40%; height: 170px; }
+        .sign-steam { left: 35%; top: 59%; height: 150px; }
+        .sign-rules { left: 48%; top: 42%; height: 120px; }
+        .sign-youtube { left: 55%; top: 55%; height: 150px; }
+        .sign-roulette { left: 85%; top: 20%; height: 200px; }
+        .sign-microphone { left: 90%; top: 45%; height: 220px; }
 
         /* Модальные окна */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
@@ -97,26 +97,6 @@
         .tier-r { border-left: 4px solid #38bdf8; }
         .tier-e { border-left: 4px solid #c084fc; }
         .tier-l { border-left: 4px solid #fbbf24; }
-
-        /* ИЗМЕНЕНО: Добавлено and (pointer: coarse) */
-        @media (max-width: 768px) and (pointer: coarse) {
-            body { height: auto; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
-            header { position: static; transform: none; width: 100%; padding: 15px 10px 0; }
-            header h1 { font-size: 1.6rem; }
-            header p { font-size: 0.7rem; }
-            .room-viewport { display: none; }
-            
-            .mobile-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 20px; gap: 15px; background: radial-gradient(circle at top, #2a0b3d, #07070b); }
-            
-            .mobile-npc { width: 280px; max-width: 90%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); transition: transform 0.2s; }
-            .mobile-logo { width: 220px; max-width: 85%; cursor: pointer; filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.5)); transition: transform 0.2s; }
-            .mobile-logo:active, .mobile-npc:active { transform: scale(0.95); }
-
-            .modal-box { width: 95%; padding: 20px; max-height: 90dvh; font-size: 0.95rem; }
-            .modal-box h2 { font-size: 1.4rem; }
-            .track-item { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .play-btn { width: 100%; justify-content: center; }
-        }
     </style>
 </head>
 <body>
@@ -141,15 +121,6 @@
     <img src="a_character_with_commands.png" class="room-npc npc-commands" onclick="openModal('modal-commands')" onerror="this.style.display='none'">
     <img src="price_list.png" class="room-npc npc-price" onclick="openModal('modal-price')" onerror="this.style.display='none'">
     <img src="the_character_behind_the_computer.png" class="room-npc npc-pc" onclick="openModal('modal-pc')" onerror="this.style.display='none'">
-</div>
-
-<div class="mobile-container">
-    <img src="price_list.png" class="mobile-npc" onclick="openModal('modal-price')" onerror="this.style.display='none'">
-    <a href="https://www.donationalerts.com/r/bruhchannel" target="_blank"><img src="Donation_Alerts.png" class="mobile-logo" onerror="this.style.display='none'"></a>
-    <a href="https://donatex.gg/donate/bruhc" target="_blank"><img src="Donatex.png" class="mobile-logo" onerror="this.style.display='none'"></a>
-    <a href="https://memealerts.com/Mr.The.BooK" target="_blank"><img src="MemeAlerts.png" class="mobile-logo" onerror="this.style.display='none'"></a>
-    <img src="microphone.png" class="mobile-logo" onclick="openModal('modal-tracklist')" onerror="this.style.display='none'">
-    <a href="https://t.me/BruhContent" target="_blank"><img src="Telegram.png" class="mobile-logo" onerror="this.style.display='none'"></a>
 </div>
 
 <div class="modal-overlay" id="modal-rules">
@@ -413,25 +384,6 @@
             currentBtn = null;
         }
     }
-
-    // Масштабирование комнаты под размер окна
-    function scaleRoom() {
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        const baseW = 1920;
-        const baseH = 1080;
-        
-        // Вычисляем, насколько нужно ужать комнату
-        const scale = Math.min(vw / baseW, vh / baseH);
-        
-        // Применяем сжатие
-        const room = document.querySelector('.room-viewport');
-        room.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    }
-
-    // Запускаем сразу при загрузке и при каждом изменении размера окна
-    window.addEventListener('resize', scaleRoom);
-    scaleRoom();
 </script>
 
 </body>
